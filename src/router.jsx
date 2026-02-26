@@ -8,6 +8,7 @@ import UserProductDetail from "./pages/user/ProductDetail";
 import UserProducts from "./pages/user/Products";
 import MsgSuccess from "./pages/user/MsgSuccess";
 import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 
@@ -55,6 +56,10 @@ let router = createHashRouter([
         ],
       },
     ],
+  },
+  {
+    path: "*",
+    Component: NotFound,
   },
 ]);
 

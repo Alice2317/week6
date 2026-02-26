@@ -1,13 +1,15 @@
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { InputDom } from "../../compontents/FormEelements";
-import { cartContext } from "../../store/store";
 import Loading from "../../compontents/Loading";
+import { useDispatch,useSelector } from 'react-redux';
+import {clearCart} from '../../stores/cartStore';
+
 
 export default function Checkout() {
-  const { state, dispatch } = useContext(cartContext);
+  const dispatch = useDispatch();
+  const state = useSelector((state) => state.carts);
   const navigate = useNavigate();
   const {
     register,
@@ -39,7 +41,7 @@ export default function Checkout() {
         },
       );
       if (res.data.success) {
-        dispatch({ type: "clearCart" });
+        dispatch(clearCart());
         navigate(`/msg/${res.data.orderId}`, {
           state: {
             title: "付款",

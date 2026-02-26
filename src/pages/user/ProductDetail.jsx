@@ -1,10 +1,13 @@
 import axios from "axios";
-import { useState, useEffect,useContext } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { cartContext } from "../../store/store";
+import { useDispatch,useSelector } from 'react-redux';
+import {addCart} from '../../stores/cartStore';
+import { createAsyncMsg } from "../../stores/toastStore";
 
 export default function ProductDetail() {
-  const { state,dispatch } = useContext(cartContext);
+  const dispatch = useDispatch();
+  const state = useSelector((state) => state.carts);
   const [product, setProduct] = useState([]);
   const [count, setCount] = useState(1);
   const [isError, setError] = useState(false);
@@ -15,7 +18,6 @@ export default function ProductDetail() {
   const getProduct = async (id) => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/product/${id}`);
-      // console.log(res);
       if (res.data.success) {
         setProduct(res.data.product);
       }
@@ -28,7 +30,7 @@ export default function ProductDetail() {
     getProduct(id);
   }, [id])
 
-  const addCart = async () => {
+  const addCartItem = async () => {
     let isMax = false;
     const index = state.carts.findIndex(
       (item) => item.product_id === product.id,
@@ -39,7 +41,6 @@ export default function ProductDetail() {
       };
     }
     if (isMax)return alert("已無庫存可購買");
-    console.log('go');
     
     setLoading(true);
     try {
@@ -49,7 +50,8 @@ export default function ProductDetail() {
           "qty": count
         }
       });
-      dispatch({ type: "addCart", payload: res.data.data });
+      dispatch(addCart(res.data.data));
+      dispatch(createAsyncMsg(res.data));
       setLoading(false);
     } catch (error) {
       setError(true);
@@ -92,7 +94,7 @@ export default function ProductDetail() {
             </div>
             <button
               className='btn btn-dark w-100 rounded-0 py-3'
-              onClick={addCart}
+              onClick={()=>addCartItem()}
               disabled={isLoading}
             >
               加入購物車

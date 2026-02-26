@@ -1,24 +1,15 @@
-import { createContext } from "react";
-// cart
-export const cartContext = createContext({});
+import { createSlice } from '@reduxjs/toolkit';
 
-export const initCarts = {
-  carts: [],
-  isLoading: true,
-};
-
-export const cartReducer = (state, action) => {
-  switch (action.type) {
-    case 'initCarts':
-      return {
-        ...state,
-        carts: action.payload.carts,
-        isLoading: false,
-      };
-    case 'addCart':
-      
+export const carts = createSlice({
+  name: 'carts',
+  initialState: {
+    carts: [],
+    isLoading: true,
+  },
+  reducers: {
+    addCart(state, action) {
       let addIndex = state.carts.findIndex(item => item.product_id === action.payload.product_id);
-      
+
       // 避免重複的產品
       if (addIndex > -1) {
         let newCarts = state.carts.map((item, index) => {
@@ -34,13 +25,25 @@ export const cartReducer = (state, action) => {
           carts: [...state.carts, action.payload],
         }
       }
-    case 'removeCart':
+    },
+    removeCart(state, action) {
       let removeIndex = state.carts.findIndex(item => item.product_id === action.payload.product_id);
       state.carts.splice(removeIndex, 1);
       return { ...state };
-    case 'clearCart':
-      return { ...state, carts: []};
-    default:
-      return state;
+    },
+    clearCart(state, action) {
+      return { ...state, carts: [] };
+    },
+    initCarts(state, action) {
+      return {
+        ...state,
+        carts: action.payload.carts,
+        isLoading: false,
+      };
+    },
   }
-};
+});
+
+export const { addCart, removeCart, clearCart, initCarts } = carts.actions;
+
+export default carts.reducer;

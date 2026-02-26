@@ -1,11 +1,13 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { cartContext } from "../../store/store";
 import Loading from "../../compontents/Loading";
+import { useDispatch,useSelector } from 'react-redux';
+import {removeCart,addCart,clearCart} from '../../stores/cartStore';
+import { createAsyncMsg } from "../../stores/toastStore";
 
 export default function Carts() {
-  const { state, dispatch } = useContext(cartContext);
+  const dispatch = useDispatch();
+  const state = useSelector((state) => state.carts);
 
   const removeCartItem = async (id) => {
     try {
@@ -13,10 +15,10 @@ export default function Carts() {
         `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/cart/${id}`,
       );
       if (res.data.success) {
-        dispatch({ type: "removeCart", payload: { id } });
+        dispatch(removeCart(id));
       }
     } catch (error) {
-      alert("刪除產品失敗");
+      dispatch(createAsyncMsg({success:false,id:new Date().getTime(),message:'刪除產品失敗'}));
     }
   };
 
@@ -32,23 +34,23 @@ export default function Carts() {
         },
       );
       if (res.data.success) {
-        dispatch({ type: "addCart", payload: res.data.data });
+        dispatch(addCart(res.data.data));
       }
     } catch (error) {
-      alert("更新產品失敗");
+      dispatch(createAsyncMsg({success:false,id:new Date().getTime(),message:'更新產品失敗'}));
     }
   };
 
-  const clearCart = async () => {
+  const clearCarts = async () => {
     try {
       const res = await axios.delete(
         `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/carts`,
       );
       if (res.data.success) {
-        dispatch({ type: "clearCart" });
+        dispatch(clearCart());
       }
     } catch (error) {
-      alert("清空購物車失敗");
+      dispatch(createAsyncMsg({success:false,id:new Date().getTime(),message:'請重新操作清空購物車'}));
     }
   };
 
@@ -128,7 +130,7 @@ export default function Carts() {
           <button
             type='button'
             className='btn btn-danger btn-block mt-4 rounded-0 py-3'
-            onClick={() => clearCart()}
+            onClick={() => clearCarts()}
           >
             清空購物車
           </button>

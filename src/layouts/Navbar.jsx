@@ -1,11 +1,14 @@
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState, useContext } from "react";
-import { cartContext } from "../store/store";
+import { useEffect, useState } from "react";
+import { useDispatch,useSelector } from "react-redux";
+import {initCarts} from '../stores/cartStore';
+import {createAsyncMsg} from '../stores/toastStore';
 
 export default function Navbar() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { state, dispatch } = useContext(cartContext);
+  const {carts} = useSelector((state) => state.carts);
   const [isAuth, setisAuth] = useState(false);
   const token = document.cookie.replace(
     /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
@@ -33,10 +36,26 @@ export default function Navbar() {
       setisAuth(false);
       navigate("/");
     } catch (error) {
-      alert('登出失敗');
+      dispatch(createAsyncMsg({success:false,id:new Date().getTime(),message:'登出失敗'}));
     }
   };
 
+  
+  const getCart = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE}/v2/api/${import.meta.env.VITE_API_PATH}/cart`,
+      );
+      if (res.data.success) {
+        dispatch(initCarts(res.data.data));
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getCart();
+  }, []);
+  
   return (
     <div className='bg-white sticky-top'>
       <div className='container'>
@@ -92,10 +111,7 @@ export default function Navbar() {
             <Link className='btn btn-primary position-relative' to='/carts'>
               <i className='bi bi-cart'></i>
               <span className='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>
-                {state.carts.length>0 && state.carts.reduce((a, b) => {
-                  a += b.qty;
-                  return a;
-                }, 0)}
+                {carts?.length === 0?'':carts?.length}
               </span>
             </Link>
           </div>

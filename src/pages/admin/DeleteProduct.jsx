@@ -1,6 +1,9 @@
 import axios from "axios";
+import { useDispatch } from 'react-redux';
+import { createAsyncMsg } from "../../stores/toastStore";
 
 export default function DeleteProduct({ eventHide, tempProduct, getProducts }) {
+  const dispatch = useDispatch();
   const removeItem = async () => {
     try {
       const res = await axios.delete(
@@ -9,9 +12,10 @@ export default function DeleteProduct({ eventHide, tempProduct, getProducts }) {
       if(res.data.success){
         eventHide();
         getProducts();
+        dispatch(createAsyncMsg({success:true,id:new Date().getTime(),message:'已刪除產品'}));
       }
     } catch (error) {
-      alert('upload', error);
+      dispatch(createAsyncMsg({success:false,id:new Date().getTime(),message:'刪除產品失敗'}));
     }
   };
 

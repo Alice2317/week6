@@ -1,7 +1,4 @@
 export const InputDom = ({ register, errors, id, labelText, type, rules }) => {
-  // console.log('input', id,labelText,type,rules);
-  // console.log(register, errors);
-
   return <>
     <label htmlFor={id} className='form-label'>
       {labelText}

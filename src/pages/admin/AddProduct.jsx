@@ -1,7 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useDispatch } from 'react-redux';
+import { createAsyncMsg } from "../../stores/toastStore";
 
 export default function AddProduct({ eventHide, getProducts,action,tempProduct }) {
+  const dispatch = useDispatch();
   const [tempData, setTempData] = useState({
     "category": "",
     "content": "",
@@ -65,8 +68,9 @@ export default function AddProduct({ eventHide, getProducts,action,tempProduct }
       await axios[api_method](api, { data: tempData });
       eventHide();
       getProducts();
+      dispatch(createAsyncMsg({success:true,id:new Date().getTime(),message:'已新增產品'}));
     } catch (error) {
-      alert("save", error);
+      dispatch(createAsyncMsg({success:false,id:new Date().getTime(),message:'新增產品失敗'}));
     }
   };
   
@@ -81,7 +85,7 @@ export default function AddProduct({ eventHide, getProducts,action,tempProduct }
         formData,
       );
     } catch (error) {
-      alert('upload',error);
+      dispatch(createAsyncMsg({success:false,id:new Date().getTime(),message:'上傳圖片失敗'}));
     }
   }
   
@@ -145,7 +149,6 @@ export default function AddProduct({ eventHide, getProducts,action,tempProduct }
                     </label>
                   </form>
                 </div>
-                <img src='' alt='' className='img-fluid' />
               </div>
               <div className='col-sm-8'>
                 <div className='form-group mb-2'>

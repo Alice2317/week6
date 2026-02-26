@@ -65,7 +65,9 @@ export default function AddProduct({ eventHide, getProducts,action,tempProduct }
           ? `${import.meta.env.VITE_API_BASE}/api/${import.meta.env.VITE_API_PATH}/admin/product/${tempProduct.id}`
           : `${import.meta.env.VITE_API_BASE}/api/${import.meta.env.VITE_API_PATH}/admin/product`;
 
-      await axios[api_method](api, { data: tempData });
+      const res = await axios[api_method](api, { data: tempData });
+      if(!res.data.success)return alert(res.data.message.join('、'));
+      
       eventHide();
       getProducts();
       dispatch(createAsyncMsg({success:true,id:new Date().getTime(),message:'已新增產品'}));
